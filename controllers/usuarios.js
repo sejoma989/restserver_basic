@@ -1,6 +1,6 @@
 import {request, response} from "express";
-import Usuario from "../models/usuario.js";
 import bcrypt from 'bcrypt';
+import Usuario from "../models/usuario.js";
 
 
 
@@ -54,7 +54,7 @@ const usuariosPost = async(req, res = response) => {
 }
 
 
-const ususariosPut = async(req, res = response) => {
+const usuariosPut = async(req, res = response) => {
 
     const { id } = req.params;
     const { _id, password, google, correo, ...resto } = req.body;
@@ -83,22 +83,20 @@ const usuariosPatch = (req, res = response) => {
 const usuariosDelete = async(req, res = response) => {
     const { id } = req.params;
 
-    // Borrado fisico
-    // const usuario = await Usuario.findByIdAndDelete( id );
-
     // Borrado por referencia
     const usuario = await Usuario.findByIdAndUpdate( id, { estado: false } );
-
-    res.json({
-        usuario
-    })
+    
+    // Informacion de usuario autenticado para la ruta DELETE
+    // const usuarioAutenticado = req.usuario;
+    // res.json({ usuario, usuarioAutenticado })
+    res.json(usuario);
 }
 
 
 export {
     usuariosGet,
     usuariosPost,
-    ususariosPut,
+    usuariosPut,
     usuariosPatch,
     usuariosDelete
 }

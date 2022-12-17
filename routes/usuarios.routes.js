@@ -1,7 +1,13 @@
 import Router from "express";
 import { check } from 'express-validator';
 
-import { validarCampos } from '../middlewares/validar-campos.js'
+import { 
+    validarCampos,
+    validarJWT,
+    esAdminRole, 
+    tieneRole
+} from '../middlewares/index.js'
+
 
 import { 
     esRoleValido, 
@@ -14,12 +20,12 @@ import {
     usuariosGet, 
     usuariosPatch, 
     usuariosPost, 
-    ususariosPut 
+    usuariosPut 
 } from "../controllers/usuarios.js";
 
+
+
 const router = Router();
-
-
 
 router.get('/', usuariosGet );
 
@@ -38,11 +44,14 @@ router.put('/:id', [
     check('id').custom( existeUsuarioPorId ),           // check('id').custom( (id) => existeUsuarioPorId( id ) ),
     check('rol').custom( (rol) => esRoleValido(rol)),
     validarCampos
-], ususariosPut );
+], usuariosPut );
 
 router.patch('/', usuariosPatch );
 
 router.delete('/:id',[
+    validarJWT,
+    // esAdminRole,
+    tieneRole('ADMIN_ROLE', 'VENTAS_ROLE', 'NOSE_ROLE'),
     check('id', 'Ingrese un id valido de mongo').isMongoId(),
     check('id').custom( existeUsuarioPorId ),   
     validarCampos
