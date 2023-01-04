@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors"
 
-import Usuarios from '../routes/usuarios.routes.js';
 import auth from '../routes/auth.routes.js';
+import categorias from '../routes/categorias.routes.js';
+import productos from '../routes/productos.routes.js';
+import usuarios from '../routes/usuarios.routes.js';
 
 import { dbConnection } from "../database/config.js";
 
@@ -13,8 +15,18 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
 
-        this.usuariosPath = '/api/usuarios';
-        this.authPath = '/api/auth';
+        // Antiguo llamado a los path
+        // this.usuariosPath = '/api/usuarios';
+        // this.authPath = '/api/auth';
+
+        // Creacion de objeto paths
+        this.paths = {
+            auth:       '/api/auth',
+            categorias: '/api/categorias',
+            productos:  '/api/productos',
+            usuarios:   '/api/usuarios',
+        }
+
 
         // Conectar a BD
         this.conectarDB();
@@ -46,8 +58,10 @@ class Server {
 
     routes() {
 
-        this.app.use( this.authPath, auth );
-        this.app.use( this.usuariosPath, Usuarios );
+        this.app.use( this.paths.auth, auth );
+        this.app.use( this.paths.categorias, categorias );
+        this.app.use( this.paths.productos, productos )
+        this.app.use( this.paths.usuarios, usuarios );
     }
 
 
