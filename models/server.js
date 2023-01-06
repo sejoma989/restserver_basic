@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors"
 
 import auth from '../routes/auth.routes.js';
+import buscar from '../routes/buscar.routes.js';
 import categorias from '../routes/categorias.routes.js';
 import productos from '../routes/productos.routes.js';
 import usuarios from '../routes/usuarios.routes.js';
@@ -22,6 +23,7 @@ class Server {
         // Creacion de objeto paths
         this.paths = {
             auth:       '/api/auth',
+            buscar:     '/api/buscar',
             categorias: '/api/categorias',
             productos:  '/api/productos',
             usuarios:   '/api/usuarios',
@@ -59,6 +61,7 @@ class Server {
     routes() {
 
         this.app.use( this.paths.auth, auth );
+        this.app.use( this.paths.buscar, buscar );
         this.app.use( this.paths.categorias, categorias );
         this.app.use( this.paths.productos, productos )
         this.app.use( this.paths.usuarios, usuarios );
