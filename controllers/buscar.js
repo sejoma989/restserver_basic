@@ -1,5 +1,5 @@
-import { query, response } from "express";
-import { isValidObjectId } from "mongoose";
+import { response } from "express";
+import { isValidObjectId, ObjectId } from "mongoose";
 import {
     Categoria, 
     Producto, 
@@ -10,6 +10,7 @@ const coleccionesPermitidas = [
     'usuarios',
     'categorias',
     'productos',
+    'productos_categoria',
     'roles',
 ];
 
@@ -114,6 +115,47 @@ const buscarProductos = async ( termino = '', res = response ) => {
 
 }
 
+const buscarProductosPorCategoria = async ( termino = '', res = response ) => {
+
+    const esMongoId = await isValidObjectId( termino );
+
+    if ( esMongoId ) {
+        const producto = await Producto.find({categoria: termino}, {estado: true } )
+            .populate('categoria', 'nombre');
+        return res.json({
+            results: ( producto ) ? [ producto ] : []
+        })
+    }
+
+    const regex = new RegExp( termino, 'i' );
+
+    const categorias = await Categoria.find( {nombre: regex, estado: true } );
+
+    if ( !categorias.length ) {
+        return res.status(400).json({
+            msg: `No hay resultados de categorias para el termino: ${termino}`
+        })
+    }
+
+    const query2 = {
+        $or: [ ...categorias.map ( c => { return { categoria: c._id } } ) ],
+        $and: [ { estado: true }]
+    }
+
+    const [total, productos] = await Promise.all([
+        Producto.countDocuments(query2),
+        Producto.find(query2).
+        populate('categoria', 'nombre')
+
+    ])
+
+    res.json({
+        total,
+        results: productos
+    })
+
+}
+
 const buscar = ( req, res = response ) => {
 
     const { coleccion, termino } = req.params;
@@ -129,6 +171,10 @@ const buscar = ( req, res = response ) => {
     
         case 'productos':
             buscarProductos( termino, res )    
+        break;
+
+        case 'productos_categoria':
+            buscarProductosPorCategoria( termino, res )    
         break;
 
         default:
