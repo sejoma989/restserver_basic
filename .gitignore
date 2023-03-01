@@ -2,4 +2,5 @@
 
 .env
 
-/uploads/*
+/uploads/productos/**.*
+/uploads/usuarios/**.*
